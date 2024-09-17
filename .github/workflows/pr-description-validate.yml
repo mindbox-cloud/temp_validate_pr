@@ -2,6 +2,7 @@ name: Validate PR description is not empty
 
 on:
   pull_request:
+  issue_comment:
 
 jobs:
   check-description:
@@ -54,7 +55,7 @@ jobs:
           `.split('\n').map(line => line.trim()).join('\n')
 
     - name: Update comment with check succeeded statement
-        if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
+        if: ${{ github.event.issue.pull_request }} && ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
