@@ -35,33 +35,31 @@ jobs:
           ⚠️ **Пожалуйста, добавь описание к pull request.**
 
     - name: Update comment with validation failed statement
-        if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'false' }}
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          edit-mode: replace
-          body: `
-            ⚠️ **Пожалуйста, добавь описание к pull request.**
+      if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'false' }}
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        edit-mode: replace
+        body: |
+          ⚠️ **Пожалуйста, добавь описание к pull request.**
 
-            Описание pull request помогает лучше понять изменения, которые вы вносите, облегчает процесс ревью и поиска причин инцидентов.
-            Описание должно содержать **причину** изменений: какую **проблему** решаем, **зачем** делаем изменение, а не что изменилось.
-            Причина может быть в описании issue или в треде, тогда достаточно указать ссылку.
+          Описание pull request помогает лучше понять изменения, которые вы вносите, облегчает процесс ревью и поиска причин инцидентов.
+          Описание должно содержать **причину** изменений: какую **проблему** решаем, **зачем** делаем изменение, а не что изменилось.
+          Причина может быть в описании issue или в треде, тогда достаточно указать ссылку.
 
-            * Добавь ссылку на issue или тред, в котором раскрыта причина изменения
-            * Если требуется, коротко опиши зачем делаешь изменение, какую проблему решаешь
+          * Добавь ссылку на issue или тред, в котором раскрыта причина изменения
+          * Если требуется, коротко опиши зачем делаешь изменение, какую проблему решаешь
 
-            Спасибо!
-          `.split('\n').map(line => line.trim()).join('\n')
+          Спасибо!
 
     - name: Update comment with check succeeded statement
-        if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          edit-mode: replace
-          body: `
-            -- Проверка на непустое описание ПР --
-            :white_check_mark: Спасибо, что добавил описание :heart:
-          `.split('\n').map(line => line.trim()).join('\n')
+      if: ${{ github.event.issue.pull_request }} && ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        edit-mode: replace
+        body: |
+          -- Проверка на непустое описание ПР --
+          :white_check_mark: Спасибо, что добавил описание :heart:
