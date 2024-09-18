@@ -60,12 +60,12 @@ jobs:
           ⚠️ **Пожалуйста, добавь описание к pull request.**
 
     - name: Update comment with check succeeded statement
-      if: ${{ github.event.issue.pull_request }} && ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
+      if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.pull_request.number }}
         comment-id: ${{ steps.fc.outputs.comment-id }}
-        edit-mode: replace
+        edit-mode: append
         body: |
           -- Проверка на непустое описание ПР --
           :white_check_mark: Спасибо, что добавил описание :heart:
