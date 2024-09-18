@@ -3,11 +3,6 @@ name: Validate PR description is not empty
 on:
   pull_request:
   issue_comment:
-    types: [created]
-
-permissions:
-  pull-requests: write
-  contents: read
 
 jobs:
   respond-to-pr-comment:
@@ -86,4 +81,3 @@ jobs:
     - name: Fail if there are validation errors
       if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'false' }}
       run: exit 1
-
