@@ -1,4 +1,4 @@
-name: Validate PR description is not empty
+name: Validate PR description is not empty - 2
 
 on:
   pull_request:
