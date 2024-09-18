@@ -20,10 +20,10 @@ jobs:
         script: |
           const pr = context.payload.pull_request;
           if (!pr || !pr.body || pr.body.trim().length === 0) {
-            echo "pr_description_check_passed=false" >> $GITHUB_OUTPUT
+            core.setOutput('pr_description_check_passed', 'false');
             throw new Error('Описание pull request не может быть пустым.');
           }
-          echo "pr_description_check_passed=true" >> $GITHUB_OUTPUT
+          core.setOutput('pr_description_check_passed', 'true');
 
     - name: Find Comment
       uses: peter-evans/find-comment@v3
