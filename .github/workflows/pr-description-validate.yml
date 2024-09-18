@@ -28,8 +28,24 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const pr = context.payload.pull_request;
-          console.log('pr = ', pr);
-          console.log('pr.body = ', pr.body);
+          # console.log('pr = ', pr);
+          # console.log('pr.body = ', pr.body);
+
+          const { data: comments } = await github.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: pr.number
+          });
+
+          // Фильтруем комментарии, чтобы оставить только комментарии от пользователей
+          const userComments = comments.filter(comment => comment.user.type === 'User');
+
+          if (userComments.length > 0) {
+            console.log(`There are ${userComments.length} comments from users (not bots).`);
+          } else {
+            console.log('No comments from users (only bots or no comments).');
+          }
+
           if (!pr || !pr.body || pr.body.trim().length === 0) {
             core.setOutput('pr_description_check_passed', 'false');
           } 
