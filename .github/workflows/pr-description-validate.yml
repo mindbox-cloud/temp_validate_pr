@@ -3,6 +3,7 @@ name: Validate PR description is not empty
 on:
   pull_request:
   issue_comment:
+    types: [created]
 
 jobs:
   respond-to-pr-comment:
