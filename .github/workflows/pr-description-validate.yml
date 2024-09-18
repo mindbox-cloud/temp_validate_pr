@@ -19,7 +19,9 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const pr = context.payload.pull_request;
+          console.log('pr.body = ', pr.body);
           if (!pr || !pr.body || pr.body.trim().length === 0) {
+            console.log('Описание pull request отсутствует или пусто.');
             core.setOutput('pr_description_check_passed', 'false');
           }
           core.setOutput('pr_description_check_passed', 'true');
