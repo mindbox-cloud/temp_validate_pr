@@ -3,9 +3,17 @@ name: Validate PR description is not empty
 on:
   pull_request:
   issue_comment:
-    types: [created]
 
 jobs:
+  respond-to-pr-comment:
+    if: ${{ github.event.issue.pull_request }} # Проверка, что комментарий относится к PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print the comment body
+        run: |
+          echo "Comment added to PR: ${{ github.event.comment.body }}"
+
   check-description:
     runs-on: ubuntu-latest
 
