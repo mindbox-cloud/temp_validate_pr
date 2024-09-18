@@ -26,6 +26,10 @@ jobs:
           }
           core.setOutput('pr_description_check_passed', 'true');
 
+    - name: Print pr_description_check_passed
+      run: |
+        echo "pr_description_check_passed is: ${{ steps.validate_description_step.outputs.pr_description_check_passed }}"
+
     - name: Find Comment
       uses: peter-evans/find-comment@v3
       id: fc
