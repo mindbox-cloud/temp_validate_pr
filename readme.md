@@ -1,2 +1,2 @@
 This is a repository to test the PR description validation
-Another line 1
+Another line 2
