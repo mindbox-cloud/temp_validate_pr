@@ -5,7 +5,7 @@ on:
   issue_comment:
 
 jobs:
-  check-description:
+  check-description-2:
     runs-on: ubuntu-latest
 
     steps:
