@@ -2,18 +2,8 @@ name: Validate PR description is not empty
 
 on:
   pull_request:
-  issue_comment:
 
 jobs:
-  respond-to-pr-comment:
-    if: ${{ github.event.issue.pull_request }} # Проверка, что комментарий относится к PR
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Print the comment body
-        run: |
-          echo "Comment added to PR: ${{ github.event.comment.body }}"
-
   check-description:
     runs-on: ubuntu-latest
 
@@ -31,21 +21,6 @@ jobs:
           # console.log('pr = ', pr);
           # console.log('pr.body = ', pr.body);
 
-          const { data: comments } = await github.issues.listComments({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: pr.number
-          });
-
-          // Фильтруем комментарии, чтобы оставить только комментарии от пользователей
-          const userComments = comments.filter(comment => comment.user.type === 'User');
-
-          if (userComments.length > 0) {
-            console.log(`There are ${userComments.length} comments from users (not bots).`);
-          } else {
-            console.log('No comments from users (only bots or no comments).');
-          }
-
           if (!pr || !pr.body || pr.body.trim().length === 0) {
             core.setOutput('pr_description_check_passed', 'false');
           } 
@@ -53,15 +28,23 @@ jobs:
             core.setOutput('pr_description_check_passed', 'true');
           }
 
-    - name: Print pr_description_check_passed
-      run: |
-        echo "pr_description_check_passed is: ${{ steps.validate_description_step.outputs.pr_description_check_passed }}"
+    - name: Find Comment
+      if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
+      uses: peter-evans/find-comment@v3
+      id: fc
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: |
+          ⚠️ **Пожалуйста, добавь описание к pull request.**
 
     - name: Update comment with validation failed statement
       if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'false' }}
       uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.pull_request.number }}
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        edit-mode: replace
         body: |
           ⚠️ **Пожалуйста, добавь описание к pull request.**
 
@@ -74,27 +57,13 @@ jobs:
 
           Спасибо!
 
-    - name: Find Comment
-      if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
-      uses: peter-evans/find-comment@v3
-      id: fc
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        comment-author: 'github-actions[bot]'
-        body-includes: |
-          ⚠️ **Пожалуйста, добавь описание к pull request.**
-
     - name: Update comment with check succeeded statement
       if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.pull_request.number }}
         comment-id: ${{ steps.fc.outputs.comment-id }}
-        edit-mode: append
+        edit-mode: replace
         body: |
           -- Проверка на непустое описание ПР --
           :white_check_mark: Спасибо, что добавил описание :heart:
-
-    - name: Fail if there are validation errors
-      if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'false' }}
-      run: exit 1
