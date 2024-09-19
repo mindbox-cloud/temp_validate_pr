@@ -18,9 +18,6 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const pr = context.payload.pull_request;
-          # console.log('pr = ', pr);
-          # console.log('pr.body = ', pr.body);
-
           if (!pr || !pr.body || pr.body.trim().length === 0) {
             core.setOutput('pr_description_check_passed', 'false');
           } 
