@@ -2,6 +2,7 @@ name: Validate PR description is not empty
 
 on:
   pull_request:
+  issue_comment:
 
 jobs:
   check-description:
@@ -19,14 +20,12 @@ jobs:
         script: |
           const pr = context.payload.pull_request;
           if (!pr || !pr.body || pr.body.trim().length === 0) {
-            core.setOutput('pr_description_check_passed', 'false');
-          } 
-          else {
-            core.setOutput('pr_description_check_passed', 'true');
+            echo "pr_description_check_passed=false" >> $GITHUB_OUTPUT
+            throw new Error('Описание pull request не может быть пустым.');
           }
+          echo "pr_description_check_passed=true" >> $GITHUB_OUTPUT
 
     - name: Find Comment
-      if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
       uses: peter-evans/find-comment@v3
       id: fc
       with:
@@ -55,7 +54,7 @@ jobs:
           Спасибо!
 
     - name: Update comment with check succeeded statement
-      if: ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
+      if: ${{ github.event.issue.pull_request }} && ${{ steps.validate_description_step.outputs.pr_description_check_passed == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.pull_request.number }}
